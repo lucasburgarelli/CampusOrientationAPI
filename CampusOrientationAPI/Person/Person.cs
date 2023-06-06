@@ -2,7 +2,7 @@
 
 namespace CampusOrientationAPI.Person;
 
-public class Person
+public sealed class Person
 {
     [NotNull]
     public String? Ra { get; set; }

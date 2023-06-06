@@ -6,7 +6,6 @@ namespace CampusOrientationAPI.Person;
 [ApiController]
 public class PersonController : ControllerBase
 {
-    // GET: api/<PersonController>
     [HttpGet]
     public IEnumerable<string> Get()
     {
