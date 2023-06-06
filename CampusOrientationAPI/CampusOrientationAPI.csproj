@@ -11,6 +11,10 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CompleteClass\" />
+  </ItemGroup>
 	
 	
 </Project>
