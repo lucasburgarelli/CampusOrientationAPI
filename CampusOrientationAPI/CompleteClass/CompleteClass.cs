@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CampusOrientationAPI.CompleteClasses;
 
 [Table("CompleteClass")]
+[Keyless]
 public sealed class CompleteClass
 {
     [Column("Datetime")]

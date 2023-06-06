@@ -2,7 +2,7 @@
 
 namespace CampusOrientationAPI.Class;
 
-[Route("api/[controller]")]
+[Route("api/class")]
 [ApiController]
 public class ClassController : ControllerBase
 {

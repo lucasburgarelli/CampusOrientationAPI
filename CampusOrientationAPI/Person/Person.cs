@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CampusOrientationAPI.People;
@@ -6,6 +8,7 @@ namespace CampusOrientationAPI.People;
 [Table("Person")]
 public sealed class Person
 {
+    [Key]
     [Column("Ra")]
     [NotNull]
     public String? Ra { get; set; }

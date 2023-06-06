@@ -1,43 +1,43 @@
 ﻿using CampusOrientationAPI.Data;
+using CampusOrientationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace CampusOrientationAPI.CompleteClasses;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/completeclass")]
 public class CompleteClassController : ControllerBase
 {
-    private readonly DataContext _context;
+    private readonly CampusorientationContext _context;
 
-    public CompleteClassController(DataContext context)
+    public CompleteClassController(CampusorientationContext context)
     {
         this._context = context;
     }
+    [HttpGet]
     public async Task<IActionResult> GetAllClassesAsync()
     {
-        return new string[] { "value1", "value2" };
+        var classes = await _context.Classes.AsNoTracking().ToListAsync();
+
+        return classes == null ? NotFound() : Ok(classes);
     }
 
-    [HttpGet("{id}")]
-    public string Get(int id)
-    {
-        return "value";
-    }
+    //[HttpPost]
+    //public async Task<IActionResult> PostAsync([FromBody] Completeclass model)
+    //{
+    //    if (!ModelState.IsValid) return BadRequest();
 
-    [HttpPost]
-    public void Post([FromBody] string value)
-    {
-    }
-
-    [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
-    {
-    }
-
-
-    [HttpDelete("{id}")]
-    public void Delete(int id)
-    {
-    }
+    //    try
+    //    {
+    //        await _context.Completeclasses.AddAsync(model);
+    //        await _context.SaveChangesAsync();
+    //        return Ok("Criado aqui");
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        return BadRequest(e.Message);
+    //    }
+    //}
 }
