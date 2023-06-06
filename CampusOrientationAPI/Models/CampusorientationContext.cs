@@ -42,7 +42,7 @@ public partial class CampusorientationContext : DbContext
             entity.HasIndex(e => e.Datetime, "indexnamebackupclass");
 
             entity.Property(e => e.Backuptime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamptz")
                 .HasColumnName("backuptime");
             entity.Property(e => e.Classroom)
                 .HasMaxLength(11)
@@ -51,7 +51,7 @@ public partial class CampusorientationContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("currentuser");
             entity.Property(e => e.Datetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamptz")
                 .HasColumnName("datetime");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Idcourse)
@@ -69,7 +69,7 @@ public partial class CampusorientationContext : DbContext
             entity.HasIndex(e => e.Name, "indexnamebackupperson");
 
             entity.Property(e => e.Backuptime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamptz")
                 .HasColumnName("backuptime");
             entity.Property(e => e.Currentuser)
                 .HasMaxLength(255)
@@ -99,7 +99,7 @@ public partial class CampusorientationContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("idcourse");
             entity.Property(e => e.Datetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamptz")
                 .HasColumnName("datetime");
             entity.Property(e => e.Classroom)
                 .HasMaxLength(11)
@@ -125,7 +125,7 @@ public partial class CampusorientationContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("coursename");
             entity.Property(e => e.Datetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamptz")
                 .HasColumnName("datetime");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Nameteacher)

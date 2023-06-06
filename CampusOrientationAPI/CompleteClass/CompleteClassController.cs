@@ -14,30 +14,51 @@ public class CompleteClassController : ControllerBase
 
     public CompleteClassController(CampusorientationContext context)
     {
-        this._context = context;
+        _context = context;
     }
     [HttpGet]
     public async Task<IActionResult> GetAllClassesAsync()
     {
-        var classes = await _context.Classes.AsNoTracking().ToListAsync();
+        var classes = await _context.Completeclasses.AsNoTracking().ToListAsync();
 
         return classes == null ? NotFound() : Ok(classes);
     }
 
-    //[HttpPost]
-    //public async Task<IActionResult> PostAsync([FromBody] Completeclass model)
-    //{
-    //    if (!ModelState.IsValid) return BadRequest();
+    [HttpPost]
+    public async Task<IActionResult> PostAsync([FromBody] Completeclass model)
+    {
+        if (!ModelState.IsValid) return BadRequest();
 
-    //    try
-    //    {
-    //        await _context.Completeclasses.AddAsync(model);
-    //        await _context.SaveChangesAsync();
-    //        return Ok("Criado aqui");
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        return BadRequest(e.Message);
-    //    }
-    //}
+        try
+        {
+            var teacherGuid = Guid.NewGuid().ToString();
+            var courseGuid = Guid.NewGuid().ToString();
+
+            await _context.People.AddAsync(new Person
+            {
+                Ra = teacherGuid,
+                Name = model.Nameteacher!
+            });
+            await _context.Courses.AddAsync(new Course
+            {
+                Id = courseGuid,
+                Name = model.Coursename!,
+                Rateacher = teacherGuid
+            });
+            await _context.Classes.AddAsync(new Models.Class
+            {
+                Idcourse = courseGuid,
+                Datetime = (DateTime)(model.Datetime is null ? DateTime.Now : model.Datetime),
+                Classroom= model.Classroom,
+                Description= model.Description
+            });
+
+            await _context.SaveChangesAsync();
+            return Ok("Criado aqui");
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
