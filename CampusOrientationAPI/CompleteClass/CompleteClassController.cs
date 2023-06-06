@@ -1,13 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CampusOrientationAPI.Data;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
-namespace CampusOrientationAPI.Person;
+namespace CampusOrientationAPI.CompleteClasses;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PersonController : ControllerBase
+public class CompleteClassController : ControllerBase
 {
-    [HttpGet]
-    public IEnumerable<string> Get()
+    private readonly DataContext _context;
+
+    public CompleteClassController(DataContext context)
+    {
+        this._context = context;
+    }
+    public async Task<IActionResult> GetAllClassesAsync()
     {
         return new string[] { "value1", "value2" };
     }
@@ -28,7 +35,7 @@ public class PersonController : ControllerBase
     {
     }
 
-    // DELETE api/<PersonController>/5
+
     [HttpDelete("{id}")]
     public void Delete(int id)
     {

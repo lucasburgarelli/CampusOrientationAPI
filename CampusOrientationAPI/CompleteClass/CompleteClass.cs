@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CampusOrientationAPI.CompleteClass;
+namespace CampusOrientationAPI.CompleteClasses;
 
 public sealed class CompleteClass
 {

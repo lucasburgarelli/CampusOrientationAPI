@@ -1,40 +1,82 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace CampusOrientationAPI.Course;
+namespace CampusOrientationAPI.Courses;
 
-[Route("api/[controller]")]
-[ApiController]
-public class CourseController : ControllerBase
+public class CourseController : Controller
 {
-    // GET: api/<CourseController>
-    [HttpGet]
-    public IEnumerable<string> Get()
+    // GET: CourseController
+    public ActionResult Index()
     {
-        return new string[] { "value1", "value2" };
+        return View();
     }
 
-    // GET api/<CourseController>/5
-    [HttpGet("{id}")]
-    public string Get(int id)
+    // GET: CourseController/Details/5
+    public ActionResult Details(int id)
     {
-        return "value";
+        return View();
     }
 
-    // POST api/<CourseController>
+    // GET: CourseController/Create
+    public ActionResult Create()
+    {
+        return View();
+    }
+
+    // POST: CourseController/Create
     [HttpPost]
-    public void Post([FromBody] string value)
+    [ValidateAntiForgeryToken]
+    public ActionResult Create(IFormCollection collection)
     {
+        try
+        {
+            return RedirectToAction(nameof(Index));
+        }
+        catch
+        {
+            return View();
+        }
     }
 
-    // PUT api/<CourseController>/5
-    [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    // GET: CourseController/Edit/5
+    public ActionResult Edit(int id)
     {
+        return View();
     }
 
-    // DELETE api/<CourseController>/5
-    [HttpDelete("{id}")]
-    public void Delete(int id)
+    // POST: CourseController/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Edit(int id, IFormCollection collection)
     {
+        try
+        {
+            return RedirectToAction(nameof(Index));
+        }
+        catch
+        {
+            return View();
+        }
+    }
+
+    // GET: CourseController/Delete/5
+    public ActionResult Delete(int id)
+    {
+        return View();
+    }
+
+    // POST: CourseController/Delete/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Delete(int id, IFormCollection collection)
+    {
+        try
+        {
+            return RedirectToAction(nameof(Index));
+        }
+        catch
+        {
+            return View();
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CampusOrientationAPI.Course;
+namespace CampusOrientationAPI.Courses;
 
 public sealed class Course
 {
