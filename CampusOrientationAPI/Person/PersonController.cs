@@ -1,18 +1,17 @@
 ﻿using CampusOrientationAPI.Data;
 using CampusOrientationAPI.Models;
-using CampusOrientationAPI.People;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace CampusOrientationAPI.Classes;
+namespace CampusOrientationAPI.People;
 
-[Route("api/class")]
 [ApiController]
-public sealed class ClassController : ControllerBase
+[Route("api/person")]
+public sealed class PersonController : ControllerBase
 {
     private readonly CampusOrientationDBContext _context;
 
-    public ClassController(CampusOrientationDBContext context)
+    public PersonController(CampusOrientationDBContext context)
     {
         _context = context;
     }
@@ -20,7 +19,7 @@ public sealed class ClassController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetPersonLoginAsync([FromBody] LoginViewModel model)
     {
-        if (model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
+        if(model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
 
         var person = await _context.People.AsNoTracking()
             .FirstOrDefaultAsync(p => p.Ra == model.Ra && p.Password == model.Password);

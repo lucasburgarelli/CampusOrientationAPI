@@ -1,5 +1,4 @@
 using CampusOrientationAPI.Data;
-using CampusOrientationAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +10,7 @@ builder.Services.AddSwaggerGen();
 
 var cnString = builder.Configuration.GetConnectionString("postgres");
 builder.Services.AddEntityFrameworkNpgsql()
-    .AddDbContext<CampusorientationContext>(options => 
+    .AddDbContext<CampusOrientationDBContext>(options => 
     options.UseNpgsql(cnString));
 
 

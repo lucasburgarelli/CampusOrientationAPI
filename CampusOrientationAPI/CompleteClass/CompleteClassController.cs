@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace CampusOrientationAPI.CompleteClasses;
+namespace CampusOrientationAPI.CompleteClass;
 
 [ApiController]
 [Route("api/completeclass")]
-public class CompleteClassController : ControllerBase
+public sealed class CompleteClassController : ControllerBase
 {
-    private readonly CampusorientationContext _context;
+    private readonly CampusOrientationDBContext _context;
 
-    public CompleteClassController(CampusorientationContext context)
+    public CompleteClassController(CampusOrientationDBContext context)
     {
         _context = context;
     }
@@ -45,12 +45,12 @@ public class CompleteClassController : ControllerBase
                 Name = model.Coursename!,
                 Rateacher = teacherGuid
             });
-            await _context.Classes.AddAsync(new Models.Class
+            await _context.Classes.AddAsync(new Class
             {
                 Idcourse = courseGuid,
                 Datetime = (DateTime)(model.Datetime is null ? DateTime.Now : model.Datetime),
-                Classroom= model.Classroom,
-                Description= model.Description
+                Classroom = model.Classroom,
+                Description = model.Description
             });
 
             await _context.SaveChangesAsync();

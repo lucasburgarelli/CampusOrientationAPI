@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CampusOrientationAPI.Courses;
 
-public class CourseController : Controller
+public sealed class CourseController : Controller
 {
     // GET: CourseController
     public ActionResult Index()

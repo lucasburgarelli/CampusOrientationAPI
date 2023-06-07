@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CampusOrientationAPI.Models;
 
-public partial class Backupclass
+public sealed class Backupclass
 {
     public string Idcourse { get; set; } = null!;
 

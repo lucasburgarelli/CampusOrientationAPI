@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using CampusOrientationAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CampusOrientationAPI.Models;
+namespace CampusOrientationAPI.Data;
 
-public partial class CampusorientationContext : DbContext
+public sealed class CampusOrientationDBContext : DbContext
 {
-    public CampusorientationContext()
+    public CampusOrientationDBContext()
     {
     }
 
-    public CampusorientationContext(DbContextOptions<CampusorientationContext> options)
+    public CampusOrientationDBContext(DbContextOptions<CampusOrientationDBContext> options)
         : base(options)
     {
     }
