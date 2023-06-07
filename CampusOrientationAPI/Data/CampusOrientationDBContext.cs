@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CampusOrientationAPI.Data;
 
-public  class CampusOrientationDBContext : DbContext
+public partial class CampusOrientationDBContext : DbContext
 {
     public CampusOrientationDBContext()
     {
@@ -42,18 +42,14 @@ public  class CampusOrientationDBContext : DbContext
 
             entity.HasIndex(e => e.Datetime, "indexnamebackupclass");
 
-            entity.Property(e => e.Backuptime)
-                .HasColumnType("timestamptz")
-                .HasColumnName("backuptime");
+            entity.Property(e => e.Backuptime).HasColumnName("backuptime");
             entity.Property(e => e.Classroom)
                 .HasMaxLength(11)
                 .HasColumnName("classroom");
             entity.Property(e => e.Currentuser)
                 .HasMaxLength(255)
                 .HasColumnName("currentuser");
-            entity.Property(e => e.Datetime)
-                .HasColumnType("timestamptz")
-                .HasColumnName("datetime");
+            entity.Property(e => e.Datetime).HasColumnName("datetime");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Idcourse)
                 .HasMaxLength(36)
@@ -69,12 +65,14 @@ public  class CampusOrientationDBContext : DbContext
 
             entity.HasIndex(e => e.Name, "indexnamebackupperson");
 
-            entity.Property(e => e.Backuptime)
-                .HasColumnType("timestamptz")
-                .HasColumnName("backuptime");
+            entity.Property(e => e.Backuptime).HasColumnName("backuptime");
             entity.Property(e => e.Currentuser)
                 .HasMaxLength(255)
                 .HasColumnName("currentuser");
+            entity.Property(e => e.Id)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("id");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
@@ -82,7 +80,7 @@ public  class CampusOrientationDBContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("password");
             entity.Property(e => e.Ra)
-                .HasMaxLength(36)
+                .HasMaxLength(8)
                 .IsFixedLength()
                 .HasColumnName("ra");
         });
@@ -99,9 +97,7 @@ public  class CampusOrientationDBContext : DbContext
                 .HasMaxLength(36)
                 .IsFixedLength()
                 .HasColumnName("idcourse");
-            entity.Property(e => e.Datetime)
-                .HasColumnType("timestamptz")
-                .HasColumnName("datetime");
+            entity.Property(e => e.Datetime).HasColumnName("datetime");
             entity.Property(e => e.Classroom)
                 .HasMaxLength(11)
                 .HasColumnName("classroom");
@@ -125,9 +121,7 @@ public  class CampusOrientationDBContext : DbContext
             entity.Property(e => e.Coursename)
                 .HasMaxLength(255)
                 .HasColumnName("coursename");
-            entity.Property(e => e.Datetime)
-                .HasColumnType("timestamptz")
-                .HasColumnName("datetime");
+            entity.Property(e => e.Datetime).HasColumnName("datetime");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Nameteacher)
                 .HasMaxLength(255)
@@ -144,38 +138,51 @@ public  class CampusOrientationDBContext : DbContext
 
             entity.Property(e => e.Id)
                 .HasMaxLength(36)
+                .HasDefaultValueSql("gen_random_uuid()")
                 .IsFixedLength()
                 .HasColumnName("id");
             entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.Idteacher)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("idteacher");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
-            entity.Property(e => e.Rateacher)
-                .HasMaxLength(36)
-                .IsFixedLength()
-                .HasColumnName("rateacher");
+
+            entity.HasOne(d => d.IdteacherNavigation).WithMany(p => p.Courses)
+                .HasForeignKey(d => d.Idteacher)
+                .HasConstraintName("teaches_course_fk");
         });
 
         modelBuilder.Entity<Person>(entity =>
         {
-            entity.HasKey(e => e.Ra).HasName("person_pk");
+            entity.HasKey(e => e.Id).HasName("person_pk");
 
             entity.ToTable("person");
 
             entity.HasIndex(e => e.Name, "indexnameperson");
 
-            entity.Property(e => e.Ra)
+            entity.HasIndex(e => e.Ra, "person_ra_key").IsUnique();
+
+            entity.Property(e => e.Id)
                 .HasMaxLength(36)
+                .HasDefaultValueSql("gen_random_uuid()")
                 .IsFixedLength()
-                .HasColumnName("ra");
+                .HasColumnName("id");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
+            entity.Property(e => e.Ra)
+                .HasMaxLength(8)
+                .HasDefaultValueSql("generate_ra()")
+                .IsFixedLength()
+                .HasColumnName("ra");
 
-            entity.HasMany(d => d.Idcourses).WithMany(p => p.Rastudents)
+            entity.HasMany(d => d.Idcourses).WithMany(p => p.Idstudents)
                 .UsingEntity<Dictionary<string, object>>(
                     "Study",
                     r => r.HasOne<Course>().WithMany()
@@ -183,17 +190,17 @@ public  class CampusOrientationDBContext : DbContext
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("study_course_fk"),
                     l => l.HasOne<Person>().WithMany()
-                        .HasForeignKey("Rastudent")
+                        .HasForeignKey("Idstudent")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("study_student_fk"),
                     j =>
                     {
-                        j.HasKey("Rastudent", "Idcourse").HasName("study_pk");
+                        j.HasKey("Idstudent", "Idcourse").HasName("study_pk");
                         j.ToTable("study");
-                        j.IndexerProperty<string>("Rastudent")
+                        j.IndexerProperty<string>("Idstudent")
                             .HasMaxLength(36)
                             .IsFixedLength()
-                            .HasColumnName("rastudent");
+                            .HasColumnName("idstudent");
                         j.IndexerProperty<string>("Idcourse")
                             .HasMaxLength(36)
                             .IsFixedLength()

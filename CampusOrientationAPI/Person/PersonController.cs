@@ -38,7 +38,7 @@ public sealed class PersonController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostPersonAsync([FromBody] Person model)
+    public async Task<IActionResult> PostAsync([FromBody] Person model)
     {
         if (!ModelState.IsValid) return BadRequest();
 

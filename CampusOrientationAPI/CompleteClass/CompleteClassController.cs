@@ -16,6 +16,16 @@ public sealed class CompleteClassController : ControllerBase
     {
         _context = context;
     }
+
+    [HttpGet("ra")]
+    public async Task<IActionResult> GetClassesTodayByUserAsync([FromBody] String ra)
+    {
+        var classes = await _context.Completeclasses.AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Datetime.Value.Date == DateTime.Now.Date);
+
+        return classes == null ? NotFound() : Ok(classes);
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllClassesAsync()
     {
@@ -36,7 +46,7 @@ public sealed class CompleteClassController : ControllerBase
 
             await _context.People.AddAsync(new Person
             {
-                Ra = teacherGuid,
+                Id = teacherGuid,
                 Name = model.Nameteacher!
             });
             await _context.Courses.AddAsync(new Course
@@ -45,6 +55,7 @@ public sealed class CompleteClassController : ControllerBase
                 Name = model.Coursename!,
                 Idteacher = teacherGuid
             });
+            // TODO check if insert needed
             await _context.Classes.AddAsync(new Class
             {
                 Idcourse = courseGuid,

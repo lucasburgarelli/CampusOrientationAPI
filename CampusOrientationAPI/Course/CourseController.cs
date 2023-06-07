@@ -1,82 +1,60 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CampusOrientationAPI.Data;
+using CampusOrientationAPI.Models;
+using CampusOrientationAPI.People;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CampusOrientationAPI.Courses;
 
+[ApiController]
+[Route("api/course")]
 public sealed class CourseController : Controller
 {
-    // GET: CourseController
-    public ActionResult Index()
+    private readonly CampusOrientationDBContext _context;
+
+    public CourseController(CampusOrientationDBContext context)
     {
-        return View();
+        _context = context;
     }
 
-    // GET: CourseController/Details/5
-    public ActionResult Details(int id)
+    [HttpGet]
+    public async Task<IActionResult> GetPersonLoginAsync([FromBody] LoginViewModel model)
     {
-        return View();
+        if (model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
+
+        var person = await _context.People.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Ra == model.Ra && p.Password == model.Password);
+
+        return person == null ? NotFound() : Ok(person);
     }
 
-    // GET: CourseController/Create
-    public ActionResult Create()
+    [HttpGet("ra")]
+    public async Task<IActionResult> GetPersonByRaAsync([FromBody] String ra)
     {
-        return View();
+        if (!ModelState.IsValid) return BadRequest("Invalid entry");
+
+        var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(p => p.Ra == ra);
+
+        return person == null ? NotFound() : Ok(person);
     }
 
-    // POST: CourseController/Create
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Create(IFormCollection collection)
+    public async Task<IActionResult> PostPersonAsync([FromBody] Person model)
     {
+        if (!ModelState.IsValid) return BadRequest();
+
         try
         {
-            return RedirectToAction(nameof(Index));
-        }
-        catch
-        {
-            return View();
-        }
-    }
+            model.Ra = Guid.NewGuid().ToString();
 
-    // GET: CourseController/Edit/5
-    public ActionResult Edit(int id)
-    {
-        return View();
-    }
-
-    // POST: CourseController/Edit/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Edit(int id, IFormCollection collection)
-    {
-        try
-        {
-            return RedirectToAction(nameof(Index));
+            await _context.People.AddAsync(model);
+            await _context.SaveChangesAsync();
+            return Ok("Person add suceded");
         }
-        catch
+        catch (Exception e)
         {
-            return View();
-        }
-    }
-
-    // GET: CourseController/Delete/5
-    public ActionResult Delete(int id)
-    {
-        return View();
-    }
-
-    // POST: CourseController/Delete/5
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult Delete(int id, IFormCollection collection)
-    {
-        try
-        {
-            return RedirectToAction(nameof(Index));
-        }
-        catch
-        {
-            return View();
+            return BadRequest(e.Message);
         }
     }
 }

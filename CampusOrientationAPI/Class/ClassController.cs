@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CampusOrientationAPI.Classes;
 
-[Route("api/class")]
 [ApiController]
+[Route("api/class")]
 public sealed class ClassController : ControllerBase
 {
     private readonly CampusOrientationDBContext _context;
@@ -17,7 +17,7 @@ public sealed class ClassController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetClassAsync([FromBody] ClassEssentialViewModel model)
+    public async Task<IActionResult> GetAsync([FromBody] ClassEssentialViewModel model)
     {
         if (model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
 
@@ -28,13 +28,20 @@ public sealed class ClassController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostClassAsync([FromBody] Class model)
+    public async Task<IActionResult> PostAsync([FromBody] ClassViewModel model)
     {
         if (!ModelState.IsValid) return BadRequest();
 
         try
         {
-            await _context.Classes.AddAsync(model);
+            var class_ = new Class
+            {
+                Idcourse = model.IdCourse ,
+                Datetime = model.DateTime,
+                Classroom = model.Classroom,
+                Description = model.Description
+            };
+            await _context.Classes.AddAsync(class_);
             await _context.SaveChangesAsync();
             return Ok("Class add suceded");
         }
