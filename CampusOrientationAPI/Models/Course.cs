@@ -11,9 +11,11 @@ public partial class Course
 
     public string? Description { get; set; }
 
-    public string? Rateacher { get; set; }
+    public string? Idteacher { get; set; }
 
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 
-    public virtual ICollection<Person> Rastudents { get; set; } = new List<Person>();
+    public virtual Person? IdteacherNavigation { get; set; }
+
+    public virtual ICollection<Person> Idstudents { get; set; } = new List<Person>();
 }

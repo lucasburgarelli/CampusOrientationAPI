@@ -5,6 +5,8 @@ namespace CampusOrientationAPI.Models;
 
 public partial class Backupperson
 {
+    public string Id { get; set; } = null!;
+
     public string Ra { get; set; } = null!;
 
     public string Name { get; set; } = null!;

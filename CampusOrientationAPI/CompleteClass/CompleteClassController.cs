@@ -43,7 +43,7 @@ public sealed class CompleteClassController : ControllerBase
             {
                 Id = courseGuid,
                 Name = model.Coursename!,
-                Rateacher = teacherGuid
+                Idteacher = teacherGuid
             });
             await _context.Classes.AddAsync(new Class
             {

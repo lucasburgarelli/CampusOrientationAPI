@@ -1,6 +1,5 @@
 ﻿using CampusOrientationAPI.Data;
 using CampusOrientationAPI.Models;
-using CampusOrientationAPI.People;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,42 +17,50 @@ public sealed class ClassController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPersonLoginAsync([FromBody] LoginViewModel model)
+    public async Task<IActionResult> GetClassAsync([FromBody] ClassEssentialViewModel model)
     {
         if (model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
 
-        var person = await _context.People.AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Ra == model.Ra && p.Password == model.Password);
+        var class_ = await _context.Classes.AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Idcourse == model.IdCourse && c.Datetime == model.DateTime);
 
-        return person == null ? NotFound() : Ok(person);
-    }
-
-    [HttpGet("ra")]
-    public async Task<IActionResult> GetPersonByRaAsync([FromBody] String ra)
-    {
-        if (!ModelState.IsValid) return BadRequest("Invalid entry");
-
-        var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(p => p.Ra == ra);
-
-        return person == null ? NotFound() : Ok(person);
+        return class_ == null ? NotFound() : Ok(class_);
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostPersonAsync([FromBody] Person model)
+    public async Task<IActionResult> PostClassAsync([FromBody] Class model)
     {
         if (!ModelState.IsValid) return BadRequest();
 
         try
         {
-            model.Ra = Guid.NewGuid().ToString();
-
-            await _context.People.AddAsync(model);
+            await _context.Classes.AddAsync(model);
             await _context.SaveChangesAsync();
-            return Ok("Person add suceded");
+            return Ok("Class add suceded");
         }
         catch (Exception e)
         {
             return BadRequest(e.Message);
+        }
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeleteAsync([FromBody] ClassEssentialViewModel model)
+    {
+        var class_ = await _context.Classes
+            .FirstOrDefaultAsync(c => c.Idcourse == model.IdCourse && c.Datetime == model.DateTime);
+
+        try
+        {
+            if (class_ is null) return Ok();
+            _context.Classes.Remove(class_);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+        catch
+        {
+            return BadRequest();
         }
     }
 }

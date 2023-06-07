@@ -10,7 +10,7 @@ builder.Services.AddSwaggerGen();
 
 var cnString = builder.Configuration.GetConnectionString("postgres");
 builder.Services.AddEntityFrameworkNpgsql()
-    .AddDbContext<CampusOrientationDBContext>(options => 
+    .AddDbContext<CampusOrientationDBContext>(options =>
     options.UseNpgsql(cnString));
 
 
