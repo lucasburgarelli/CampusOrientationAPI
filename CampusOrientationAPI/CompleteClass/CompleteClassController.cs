@@ -1,4 +1,5 @@
-﻿using CampusOrientationAPI.Data;
+﻿using CampusOrientationAPI.CompleteClasses;
+using CampusOrientationAPI.Data;
 using CampusOrientationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +19,18 @@ public sealed class CompleteClassController : ControllerBase
     }
 
     [HttpGet("ra")]
-    public async Task<IActionResult> GetClassesTodayByUserAsync([FromBody] String ra)
+    public async Task<IActionResult> GetClassesTodayByUserAsync([FromQuery] CompleteClassRaViewModel model)
     {
-        var classes = await _context.Completeclasses.AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Datetime.Value.Date == DateTime.Now.Date);
+        // TODO select with 
+        var classes = await _context.Classes
+            .Include(c => c.IdcourseNavigation)
+            .ThenInclude(c => c.Idstudents)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.IdcourseNavigation.Idstudents.FirstOrDefault(s => s.Ra == model.Ra) != null
+            && c.Datetime.ToUniversalTime().Day == DateTime.Now.ToUniversalTime().Day);
+
+        var classesSelected = await _context.Completeclasses
+            .FirstOrDefaultAsync(c => c.Datetime.Value.ToUniversalTime().Day == DateTime.Now.ToUniversalTime().Day);
 
         return classes == null ? NotFound() : Ok(classes);
     }
@@ -44,18 +53,27 @@ public sealed class CompleteClassController : ControllerBase
             var teacherGuid = Guid.NewGuid().ToString();
             var courseGuid = Guid.NewGuid().ToString();
 
-            await _context.People.AddAsync(new Person
-            {
-                Id = teacherGuid,
-                Name = model.Nameteacher!
-            });
-            await _context.Courses.AddAsync(new Course
-            {
-                Id = courseGuid,
-                Name = model.Coursename!,
-                Idteacher = teacherGuid
-            });
-            // TODO check if insert needed
+            var sameNamePerson = await _context.People.AsNoTracking().FirstOrDefaultAsync(p => p.Name == model.Nameteacher);
+            if (sameNamePerson is not null)
+                teacherGuid = sameNamePerson.Id;
+            else
+                await _context.People.AddAsync(new Person
+                {
+                    Id = teacherGuid,
+                    Name = model.Nameteacher!
+                });
+
+            var sameNameCourse = await _context.Courses.AsNoTracking().FirstOrDefaultAsync(c => c.Name == model.Coursename);
+            if(sameNameCourse is not null)
+                courseGuid = sameNameCourse.Id;
+            else
+                await _context.Courses.AddAsync(new Course
+                {
+                    Id = courseGuid,
+                    Name = model.Coursename!,
+                    Idteacher = teacherGuid
+                });
+
             await _context.Classes.AddAsync(new Class
             {
                 Idcourse = courseGuid,
@@ -65,7 +83,7 @@ public sealed class CompleteClassController : ControllerBase
             });
 
             await _context.SaveChangesAsync();
-            return Ok("Criado aqui");
+            return Ok("Completeclass add suceded");
         }
         catch (Exception e)
         {

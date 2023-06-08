@@ -19,38 +19,39 @@ public sealed class CourseController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPersonLoginAsync([FromBody] LoginViewModel model)
+    public async Task<IActionResult> GetAllAsync()
     {
-        if (model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
+        var courses = await _context.Courses.AsNoTracking().ToListAsync();
 
-        var person = await _context.People.AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Ra == model.Ra && p.Password == model.Password);
-
-        return person == null ? NotFound() : Ok(person);
+        return courses == null ? NotFound() : Ok(courses);
     }
 
-    [HttpGet("ra")]
-    public async Task<IActionResult> GetPersonByRaAsync([FromBody] String ra)
+    [HttpGet("id")]
+    public async Task<IActionResult> GetCourseByRaAsync([FromBody] String id)
     {
         if (!ModelState.IsValid) return BadRequest("Invalid entry");
 
-        var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(p => p.Ra == ra);
+        var courses = await _context.Courses.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
 
-        return person == null ? NotFound() : Ok(person);
+        return courses == null ? NotFound() : Ok(courses);
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostPersonAsync([FromBody] Person model)
+    public async Task<IActionResult> PostAsync([FromBody] CourseViewModel model)
     {
         if (!ModelState.IsValid) return BadRequest();
 
         try
         {
-            model.Ra = Guid.NewGuid().ToString();
-
-            await _context.People.AddAsync(model);
+            await _context.Courses.AddAsync(new Course
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = model.Name,
+                Description = model.Description,
+                Idteacher = model.Idteacher
+            });
             await _context.SaveChangesAsync();
-            return Ok("Person add suceded");
+            return Ok("Course add suceded");
         }
         catch (Exception e)
         {
