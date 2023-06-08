@@ -17,7 +17,7 @@ public sealed class ClassController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAsync([FromBody] ClassEssentialViewModel model)
+    public async Task<IActionResult> GetAsync([FromQuery] ClassEssentialViewModel model)
     {
         if (model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
 
@@ -67,7 +67,7 @@ public sealed class ClassController : ControllerBase
         }
         catch
         {
-            return BadRequest();
+            return BadRequest("Verify datetime format");
         }
     }
 }

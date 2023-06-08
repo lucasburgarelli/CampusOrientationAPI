@@ -17,7 +17,7 @@ public sealed class PersonController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPersonLoginAsync([FromBody] LoginViewModel model)
+    public async Task<IActionResult> GetPersonLoginAsync([FromQuery] LoginViewModel model)
     {
         if(model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
 
@@ -28,7 +28,7 @@ public sealed class PersonController : ControllerBase
     }
 
     [HttpGet("ra")]
-    public async Task<IActionResult> GetPersonByRaAsync([FromBody] String ra)
+    public async Task<IActionResult> GetPersonByRaAsync([FromQuery] String ra)
     {
         if (!ModelState.IsValid) return BadRequest("Invalid entry");
 
@@ -38,15 +38,17 @@ public sealed class PersonController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostAsync([FromBody] Person model)
+    public async Task<IActionResult> PostAsync([FromBody] PersonAddViewModel model)
     {
         if (!ModelState.IsValid) return BadRequest();
 
         try
         {
-            model.Ra = Guid.NewGuid().ToString();
-
-            await _context.People.AddAsync(model);
+            await _context.People.AddAsync(new Person
+            {
+                Name = model.Name,
+                Password = model.Password
+            });
             await _context.SaveChangesAsync();
             return Ok("Person add suceded");
         }

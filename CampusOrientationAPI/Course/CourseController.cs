@@ -27,7 +27,7 @@ public sealed class CourseController : Controller
     }
 
     [HttpGet("id")]
-    public async Task<IActionResult> GetCourseByRaAsync([FromBody] String id)
+    public async Task<IActionResult> GetCourseByRaAsync([FromQuery] String id)
     {
         if (!ModelState.IsValid) return BadRequest("Invalid entry");
 
