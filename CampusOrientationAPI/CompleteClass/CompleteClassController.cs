@@ -3,6 +3,7 @@ using CampusOrientationAPI.Data;
 using CampusOrientationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using System;
 
 namespace CampusOrientationAPI.CompleteClass;
@@ -22,16 +23,20 @@ public sealed class CompleteClassController : ControllerBase
     public async Task<IActionResult> GetClassesTodayByUserAsync([FromQuery] CompleteClassRaViewModel model)
     {
         // TODO select with 
-        var classes = await _context.Classes
-            .Include(c => c.IdcourseNavigation)
-            .ThenInclude(c => c.Idstudents)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.IdcourseNavigation.Idstudents.FirstOrDefault(s => s.Ra == model.Ra) != null
-            && c.Datetime.ToUniversalTime().Day == DateTime.Now.ToUniversalTime().Day);
+        //var classes = await _context.Classes
+        //    .Include(c => c.IdcourseNavigation)
+        //    .ThenInclude(d => d.Idstudents)
+        //    .AsNoTracking()
+        //    .FirstOrDefaultAsync(c => c.IdcourseNavigation.Idstudents.FirstOrDefault(s => s.Ra == model.Ra) != null
+        //    && c.Datetime.ToUniversalTime().Day == DateTime.Now.ToUniversalTime().Day);
 
-        var classesSelected = await _context.Completeclasses
-            .FirstOrDefaultAsync(c => c.Datetime.Value.ToUniversalTime().Day == DateTime.Now.ToUniversalTime().Day);
-
+        var classes = await (from cl in _context.Classes
+                   join c in _context.Courses on cl.Idcourse equals c.Id
+                   join t in _context.People on c.Idteacher equals t.Id
+                   from p in c.Idstudents
+                   where p.Ra == model.Ra
+                   select new { cl.Classroom, cl.Datetime, cl.Description, CourseName = c.Name, Teacher = t.Name })
+              .ToListAsync();
         return classes == null ? NotFound() : Ok(classes);
     }
 
