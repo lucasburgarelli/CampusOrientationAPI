@@ -7,11 +7,13 @@ public partial class Class
 {
     public string Idcourse { get; set; } = null!;
 
-    public DateTime Datetime { get; set; }
+    public DateTime Datetimestart { get; set; }
+
+    public DateTime Datetimeend { get; set; }
 
     public string? Classroom { get; set; }
 
     public string? Description { get; set; }
 
-    public virtual Course IdcourseNavigation { get; set; } = null!;
+    public virtual Course Course { get; set; } = null!;
 }

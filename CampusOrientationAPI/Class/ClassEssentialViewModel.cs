@@ -7,5 +7,6 @@ public class ClassEssentialViewModel
     [Required]
     public String IdCourse { get; set; }
     [Required]
-    public DateTime DateTime { get; set; }
+    public DateTime DateTimeStart { get; set; }
+    public DateTime DateTimeEnd { get; set; }
 }

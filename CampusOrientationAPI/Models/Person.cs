@@ -13,7 +13,6 @@ public partial class Person
 
     public string? Password { get; set; }
 
-    public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
-
-    public virtual ICollection<Course> Idcourses { get; set; } = new List<Course>();
+    public IList<Study> Studies { get; set; }
+    public IList<Course> Courses { get; set; }
 }

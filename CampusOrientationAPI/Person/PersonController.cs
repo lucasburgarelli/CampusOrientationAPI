@@ -24,7 +24,7 @@ public sealed class PersonController : ControllerBase
         var person = await _context.People.AsNoTracking()
             .FirstOrDefaultAsync(p => p.Ra == model.Ra && p.Password == model.Password);
 
-        return person == null ? NotFound() : Ok(person);
+        return Ok(person);
     }
 
     [HttpGet("ra")]
@@ -34,7 +34,7 @@ public sealed class PersonController : ControllerBase
 
         var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(p => p.Ra == ra);
 
-        return person == null ? NotFound() : Ok(person);
+        return Ok(person);
     }
 
     [HttpPost]

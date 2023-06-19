@@ -27,6 +27,7 @@ public partial class CampusOrientationDBContext : DbContext
     public virtual DbSet<Course> Courses { get; set; }
 
     public virtual DbSet<Person> People { get; set; }
+    public virtual DbSet<Study> Studies { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -40,7 +41,7 @@ public partial class CampusOrientationDBContext : DbContext
                 .HasNoKey()
                 .ToTable("backupclass");
 
-            entity.HasIndex(e => e.Datetime, "indexnamebackupclass");
+            entity.HasIndex(e => e.Classroom, "indexnamebackupclass");
 
             entity.Property(e => e.Backuptime).HasColumnName("backuptime");
             entity.Property(e => e.Classroom)
@@ -49,7 +50,8 @@ public partial class CampusOrientationDBContext : DbContext
             entity.Property(e => e.Currentuser)
                 .HasMaxLength(255)
                 .HasColumnName("currentuser");
-            entity.Property(e => e.Datetime).HasColumnName("datetime");
+            entity.Property(e => e.Datetimeend).HasColumnName("datetimeend");
+            entity.Property(e => e.Datetimestart).HasColumnName("datetimestart");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Idcourse)
                 .HasMaxLength(36)
@@ -87,23 +89,24 @@ public partial class CampusOrientationDBContext : DbContext
 
         modelBuilder.Entity<Class>(entity =>
         {
-            entity.HasKey(e => new { e.Idcourse, e.Datetime }).HasName("class_pk");
+            entity.HasKey(e => new { e.Idcourse, e.Datetimestart, e.Datetimeend }).HasName("class_pk");
 
             entity.ToTable("class");
 
-            entity.HasIndex(e => e.Datetime, "indexclass");
+            entity.HasIndex(e => e.Classroom, "indexclass");
 
             entity.Property(e => e.Idcourse)
                 .HasMaxLength(36)
                 .IsFixedLength()
                 .HasColumnName("idcourse");
-            entity.Property(e => e.Datetime).HasColumnName("datetime");
+            entity.Property(e => e.Datetimestart).HasColumnName("datetimestart");
+            entity.Property(e => e.Datetimeend).HasColumnName("datetimeend");
             entity.Property(e => e.Classroom)
                 .HasMaxLength(11)
                 .HasColumnName("classroom");
             entity.Property(e => e.Description).HasColumnName("description");
 
-            entity.HasOne(d => d.IdcourseNavigation).WithMany(p => p.Classes)
+            entity.HasOne(d => d.Course).WithMany(p => p.Classes)
                 .HasForeignKey(d => d.Idcourse)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("class_fk");
@@ -121,7 +124,8 @@ public partial class CampusOrientationDBContext : DbContext
             entity.Property(e => e.Coursename)
                 .HasMaxLength(255)
                 .HasColumnName("coursename");
-            entity.Property(e => e.Datetime).HasColumnName("datetime");
+            entity.Property(e => e.Datetimeend).HasColumnName("datetimeend");
+            entity.Property(e => e.Datetimestart).HasColumnName("datetimestart");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Nameteacher)
                 .HasMaxLength(255)
@@ -149,10 +153,9 @@ public partial class CampusOrientationDBContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
-
-            entity.HasOne(d => d.IdteacherNavigation).WithMany(p => p.Courses)
-                .HasForeignKey(d => d.Idteacher)
-                .HasConstraintName("teaches_course_fk");
+            entity.HasOne(e => e.Teacher)
+                .WithMany(p => p.Courses)
+                .HasForeignKey(e => e.Idteacher);
         });
 
         modelBuilder.Entity<Person>(entity =>
@@ -181,32 +184,33 @@ public partial class CampusOrientationDBContext : DbContext
                 .HasDefaultValueSql("generate_ra()")
                 .IsFixedLength()
                 .HasColumnName("ra");
-
-            entity.HasMany(d => d.Idcourses).WithMany(p => p.Idstudents)
-                .UsingEntity<Dictionary<string, object>>(
-                    "Study",
-                    r => r.HasOne<Course>().WithMany()
-                        .HasForeignKey("Idcourse")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("study_course_fk"),
-                    l => l.HasOne<Person>().WithMany()
-                        .HasForeignKey("Idstudent")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("study_student_fk"),
-                    j =>
-                    {
-                        j.HasKey("Idstudent", "Idcourse").HasName("study_pk");
-                        j.ToTable("study");
-                        j.IndexerProperty<string>("Idstudent")
-                            .HasMaxLength(36)
-                            .IsFixedLength()
-                            .HasColumnName("idstudent");
-                        j.IndexerProperty<string>("Idcourse")
-                            .HasMaxLength(36)
-                            .IsFixedLength()
-                            .HasColumnName("idcourse");
-                    });
         });
+
+        modelBuilder.Entity<Study>(entity =>
+        {
+            entity.HasKey(st => new {st.IdStudent, st.IdCourse });
+            entity.ToTable("study");
+
+            entity.Property(s => s.IdStudent)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("idstudent");
+
+            entity.Property(s => s.IdCourse)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("idcourse");
+
+            entity.HasOne(st => st.Student)
+                .WithMany(s => s.Studies)
+                .HasForeignKey(st => st.IdStudent);
+
+            entity.HasOne(st => st.Course)
+                .WithMany(c => c.Studies)
+                .HasForeignKey(st => st.IdCourse);
+        });
+
+        
 
         OnModelCreatingPartial(modelBuilder);
     }

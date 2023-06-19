@@ -5,7 +5,9 @@ namespace CampusOrientationAPI.Models;
 
 public partial class Completeclass
 {
-    public DateTime? Datetime { get; set; }
+    public DateTime? Datetimestart { get; set; }
+
+    public DateTime? Datetimeend { get; set; }
 
     public string? Classroom { get; set; }
 

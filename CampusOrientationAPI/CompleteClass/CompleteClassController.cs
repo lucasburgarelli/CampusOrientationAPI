@@ -4,7 +4,9 @@ using CampusOrientationAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using NuGet.Packaging;
 using System;
+using System.Linq;
 
 namespace CampusOrientationAPI.CompleteClass;
 
@@ -22,22 +24,21 @@ public sealed class CompleteClassController : ControllerBase
     [HttpGet("ra")]
     public async Task<IActionResult> GetClassesTodayByUserAsync([FromQuery] CompleteClassRaViewModel model)
     {
-        // TODO select with 
-        //var classes = await _context.Classes
-        //    .Include(c => c.IdcourseNavigation)
-        //    .ThenInclude(d => d.Idstudents)
-        //    .AsNoTracking()
-        //    .FirstOrDefaultAsync(c => c.IdcourseNavigation.Idstudents.FirstOrDefault(s => s.Ra == model.Ra) != null
-        //    && c.Datetime.ToUniversalTime().Day == DateTime.Now.ToUniversalTime().Day);
+        var person = await _context.People.FirstOrDefaultAsync(p => p.Ra == model.Ra);
+        if (person == null) return BadRequest("Student does not exists");
 
-        var classes = await (from cl in _context.Classes
-                   join c in _context.Courses on cl.Idcourse equals c.Id
-                   join t in _context.People on c.Idteacher equals t.Id
-                   from p in c.Idstudents
-                   where p.Ra == model.Ra
-                   select new { cl.Classroom, cl.Datetime, cl.Description, CourseName = c.Name, Teacher = t.Name })
-              .ToListAsync();
-        return classes == null ? NotFound() : Ok(classes);
+        var studies = await _context.Studies.AsNoTracking().Where(c => c.IdStudent == person.Id).ToListAsync();
+
+        var coursesIds = studies.Select(c => c.IdCourse).ToList();
+
+        var classes = await _context.Classes
+            .Include(c => c.Course).ThenInclude(c => c.Teacher).AsNoTracking()
+            .Where(c => coursesIds.Contains(c.Idcourse)).ToListAsync();
+
+        var response = classes.Select(cl => 
+            new { cl.Classroom, cl.Datetimestart, cl.Datetimeend, cl.Description, CourseName = cl.Course.Name, Teacher = cl.Course.Teacher!.Name }).ToList();
+
+        return Ok(response);
     }
 
     [HttpGet]
@@ -82,7 +83,8 @@ public sealed class CompleteClassController : ControllerBase
             await _context.Classes.AddAsync(new Class
             {
                 Idcourse = courseGuid,
-                Datetime = (DateTime)(model.Datetime is null ? DateTime.Now : model.Datetime),
+                Datetimestart = (DateTime)(model.Datetimestart is null ? DateTime.Now : model.Datetimestart),
+                Datetimeend = (DateTime)(model.Datetimeend is null ? DateTime.Now : model.Datetimeend),
                 Classroom = model.Classroom,
                 Description = model.Description
             });

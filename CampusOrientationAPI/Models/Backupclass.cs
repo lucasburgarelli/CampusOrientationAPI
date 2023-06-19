@@ -7,7 +7,9 @@ public partial class Backupclass
 {
     public string Idcourse { get; set; } = null!;
 
-    public DateTime Datetime { get; set; }
+    public DateTime Datetimestart { get; set; }
+
+    public DateTime Datetimeend { get; set; }
 
     public string? Classroom { get; set; }
 

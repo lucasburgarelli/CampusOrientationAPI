@@ -7,7 +7,9 @@ public sealed class ClassViewModel
     [Required]
     public String IdCourse { get; set; }
     [Required]
-    public DateTime DateTime { get; set; }
+    public DateTime DateTimeStart { get; set; }
+    [Required]
+    public DateTime DateTimeEnd { get; set; }
     [Required]
     public String Classroom { get; set; }
     [Required]

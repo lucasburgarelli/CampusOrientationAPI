@@ -22,7 +22,8 @@ public sealed class ClassController : ControllerBase
         if (model is null || !ModelState.IsValid) return BadRequest("Login empty or invalid");
 
         var class_ = await _context.Classes.AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Idcourse == model.IdCourse && c.Datetime == model.DateTime);
+            .FirstOrDefaultAsync(c => c.Idcourse == model.IdCourse && c.Datetimestart == model.DateTimeStart
+            && c.Datetimeend == model.DateTimeEnd);
 
         return class_ == null ? NotFound() : Ok(class_);
     }
@@ -37,7 +38,8 @@ public sealed class ClassController : ControllerBase
             var class_ = new Class
             {
                 Idcourse = model.IdCourse ,
-                Datetime = model.DateTime,
+                Datetimestart = model.DateTimeStart,
+                Datetimeend = model.DateTimeEnd,
                 Classroom = model.Classroom,
                 Description = model.Description
             };
@@ -55,7 +57,7 @@ public sealed class ClassController : ControllerBase
     public async Task<IActionResult> DeleteAsync([FromBody] ClassEssentialViewModel model)
     {
         var class_ = await _context.Classes
-            .FirstOrDefaultAsync(c => c.Idcourse == model.IdCourse && c.Datetime == model.DateTime);
+            .FirstOrDefaultAsync(c => c.Idcourse == model.IdCourse && c.Datetimestart == model.DateTimeStart && c.Datetimeend == model.DateTimeEnd);
 
         try
         {
